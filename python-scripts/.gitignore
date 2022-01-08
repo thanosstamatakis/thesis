@@ -1,0 +1,9 @@
+node_modules/
+.env
+.vscode/
+__pychache__/
+.DS_Store
+/backups
+*.csv
+*.png
+/pics
