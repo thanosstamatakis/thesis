@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn import linear_model
+from sklearn import linear_model, svm
 from pyearth import Earth
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 import warnings
@@ -123,6 +123,41 @@ for i,pr in enumerate(predictions):
 
 res = [list(a) for a in sorted(zip(predictions, people))]
 write_to_file('res_mars.csv', ["tie_strength, friend"], res)
+
+# SVR regression model
+
+SVR_model = svm.SVR()
+
+# Fit model to training data
+SVR_model_fitted = SVR_model.fit(X,y)
+y_pred = SVR_model.predict(X)
+r2 = r2_score(y,y_pred)
+ar2 = 1 - (1-r2)*(len(y)-1)/(len(y)-len(linear_fitted.coef_)-1)
+print('Rsquared SVR:', r2)
+print('Adjusted Rsquared SVR:', ar2)
+print('MSE SVR:',mean_squared_error(y,y_pred))
+print('MAE SVR:',mean_absolute_error(y,y_pred), '\n\n')
+# SVR regression on test dataset
+people = []
+predictions = []
+
+with open("testing.csv", "r", encoding="UTF8") as file:
+    reader = csv.reader(file)
+    next(reader)
+
+    for row in reader:
+        # row_nums = row[1 : 2] + row[6:7] + row[10:19] + row[22:23]
+        row_nums = row[1:23]
+        for i in range(0, len(row_nums)):
+            row_nums[i] = int(row_nums[i])
+
+        pred = SVR_model.predict([row_nums])
+
+        people.append(row[0])
+        predictions.append(pred[0])
+
+res = [list(a) for a in sorted(zip(predictions, people))]
+write_to_file('res_svr.csv', ["tie_strength, friend"], res)
 
 # Correlation analysis
 fig_dims = (12, 12)
